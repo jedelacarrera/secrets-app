@@ -8,34 +8,51 @@ import { MonoText } from '../components/StyledText';
 
 const encrypted = Crypto.AES.encrypt("Message", "Secret Passphrase").toString();
 
-const decrypted = Crypto.AES.decrypt(encrypted, "Secret Passphrase2").toString(Crypto.enc.Utf8);
-console.log(decrypted)
+const decrypted = Crypto.AES.decrypt(encrypted, "Secret Passphrase").toString(Crypto.enc.Utf8);
 
 // https://docs.expo.io/versions/latest/react-native/asyncstorage/
 
 export default class HomeScreen extends Component {
   state = {
     keys: [],
+    values: [],
+    errors: '',
   }
 
   componentDidMount() {
-    this.getKeys();
+    this.getValues();
   }
 
-  getKeys = () => {
-    AsyncStorage.getAllKeys((_err, keys) => {
-      this.setState({ keys });
+  getValues = () => {
+    AsyncStorage.getAllKeys((error, keys) => {
+      if (error) {
+        console.log(error);
+        this.setState({ errors: 'Error getting keys, restart the app.' });
+        return;
+      }
+      AsyncStorage.multiGet(keys, (error, values) => {
+        if (error) {
+          console.log(error);
+          this.setState({ errors: 'Error getting values, restart the app.' });
+          return;
+        }
+        const decryptedValues = values.map(values => {
+          const decryptedValue = Crypto.AES.decrypt(values[1], "Secret Passphrase").toString(Crypto.enc.Utf8);
+          return [values[0], decryptedValue]
+        })
+        this.setState({ values: decryptedValues });
+      });
     });
   }
 
   removeKey = (key) => {
     AsyncStorage.removeItem(key)
-      .then(() => this.getKeys());
+      .then(() => this.getValues());
   }
 
-  renderKeys() {
-    return this.state.keys.map(key => (
-      <Text key={key}>Hi {key}</Text>
+  renderValues() {
+    return this.state.values.map((value, index) => (
+      <Text key={index}>{value[0]}: {value[1]}</Text>
     ));
   }
 
@@ -44,7 +61,7 @@ export default class HomeScreen extends Component {
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <Text>{decrypted}</Text>
-          {this.renderKeys()}
+          {this.renderValues()}
         </ScrollView>
       </View>
     );

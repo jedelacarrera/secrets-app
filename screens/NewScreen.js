@@ -1,179 +1,152 @@
-import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { Component } from 'react';
+import { AsyncStorage, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { AES } from 'crypto-js'
+import Colors from '../constants/Colors';
+import { keyPrefix } from '../constants/strings'
+import Input from '../components/Input';
+import Button from '../components/Button';
 
-import { MonoText } from '../components/StyledText';
+const INITIAL_STATE = {
+    name: '',
+    password_label: '',
+    password: '',
+    password_confirm: '',
+    secret: '',
+    existingKeyError: false,
+    successMessage: '',
+}
 
-export default function HomeScreen() {
-    return (
-        <View style={styles.container}>
+export default class NewScreen extends Component {
+    state = INITIAL_STATE
+
+    getInputValidationError() {
+        if (this.state.name.length < 2) return 'Name is not valid';
+        // if (!this.state.password_label) return 'Choose a password label. Eg. P1';
+        // if (this.state.password.length < 4) return 'Passwords must contain at least 4 characters.';
+        // if (this.state.password !== this.state.password_confirm) return 'Passwords do not match';
+        if (!this.state.secret) return 'Secret does not have a value.';
+        return false;
+    }
+
+    save = async () => {
+        const key = keyPrefix + this.state.name;
+        const item = await AsyncStorage.getItem(key);
+        if (item) {
+            this.setState({ existingKeyError: true, successMessage: '' });
+            return;
+        }
+        const encrypted = AES.encrypt(this.state.secret, "Secret Passphrase").toString();
+
+        await AsyncStorage.setItem(key, encrypted);
+        const successMessage = `${this.state.name} was saved successfully`;
+        this.clear();
+        this.setState({ successMessage });
+    }
+
+    clear = () => {
+        this.setState(INITIAL_STATE);
+    }
+
+    render() {
+        const inputValidationError = this.getInputValidationError();
+
+        return (
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                <View style={styles.welcomeContainer}>
-                    <Image
-                        source={
-                            __DEV__
-                                ? require('../assets/images/robot-dev.png')
-                                : require('../assets/images/robot-prod.png')
-                        }
-                        style={styles.welcomeImage}
+                <Input
+                    value={this.state.name}
+                    onChangeText={name => this.setState({ name })}
+                    placeholder="Eg: Gmail"
+                    label="Name"
+                    onSubmitEditing={() => this.refs.password_label.focus()}
+                />
+                <Input
+                    ref="password_label"
+                    value={this.state.password_label}
+                    onChangeText={password_label => this.setState({ password_label })}
+                    placeholder="P1 (It may help you remmeber)"
+                    label="Password label"
+                    onSubmitEditing={() => this.refs.password.focus()}
+                />
+                <Input
+                    ref="password"
+                    value={this.state.password}
+                    onChangeText={password => this.setState({ password })}
+                    placeholder="****** (Most secret password)"
+                    label="Password"
+                    onSubmitEditing={() => this.refs.password_confirm.focus()}
+                    secureTextEntry
+                />
+                <Input
+                    ref="password_confirm"
+                    value={this.state.password_confirm}
+                    onChangeText={password_confirm => this.setState({ password_confirm })}
+                    placeholder="****** (Password confirmation)"
+                    label="Password Confirmation"
+                    onSubmitEditing={() => this.refs.secret.focus()}
+                    secureTextEntry
+                />
+                <Input
+                    ref="secret"
+                    value={this.state.secret}
+                    onChangeText={secret => this.setState({ secret })}
+                    placeholder="Gmail Password"
+                    label="Secret"
+                />
+                <Text style={styles.errorText}>
+                    {this.state !== INITIAL_STATE && inputValidationError}
+                </Text>
+                <Text style={styles.errorText}>
+                    {this.state.existingKeyError && "Name already exists. Choose another one or delete the existing name in 'Secrets'"}
+                </Text>
+                <Text style={styles.successText}>
+                    {this.state.successMessage}
+                </Text>
+                <View style={styles.buttonsContainer}>
+                    <Button
+                        title="Cancel"
+                        onPress={this.clear}
+                        containerStyle={styles.cancel}
+                    />
+                    <Button
+                        onPress={this.save}
+                        disabled={inputValidationError !== false}
                     />
                 </View>
-
-                <View style={styles.getStartedContainer}>
-                    <DevelopmentModeNotice />
-
-                    <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
-
-                    <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-                        <MonoText>screens/HomeScreen.js</MonoText>
-                    </View>
-
-                    <Text style={styles.getStartedText}>
-                        Change any of the text, save the file, and your app will automatically reload.
-          </Text>
-                </View>
-
-                <View style={styles.helpContainer}>
-                    <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-                        <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-                    </TouchableOpacity>
-                </View>
             </ScrollView>
-
-            <View style={styles.tabBarInfoContainer}>
-                <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-                <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-                    <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-                </View>
-            </View>
-        </View>
-    );
-}
-
-HomeScreen.navigationOptions = {
-    header: null,
-};
-
-function DevelopmentModeNotice() {
-    if (__DEV__) {
-        const learnMoreButton = (
-            <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-                Learn more
-            </Text>
-        );
-
-        return (
-            <Text style={styles.developmentModeText}>
-                Development mode is enabled: your app will be slower but you can use useful development
-        tools. {learnMoreButton}
-            </Text>
-        );
-    } else {
-        return (
-            <Text style={styles.developmentModeText}>
-                You are not in development mode: your app will run at full speed.
-            </Text>
         );
     }
-}
-
-function handleLearnMorePress() {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
-}
-
-function handleHelpPress() {
-    WebBrowser.openBrowserAsync(
-        'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-    },
-    developmentModeText: {
-        marginBottom: 20,
-        color: 'rgba(0,0,0,0.4)',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center',
+        backgroundColor: '#f9f9f9',
+        backgroundColor: Colors.backgroundColor,
+
     },
     contentContainer: {
-        paddingTop: 30,
+        paddingTop: 20,
     },
-    welcomeContainer: {
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 20,
+    errorText: {
+        color: Colors.errorColor,
+        paddingHorizontal: 20,
+        paddingBottom: 5,
+        fontWeight: 'bold'
     },
-    welcomeImage: {
-        width: 100,
-        height: 80,
-        resizeMode: 'contain',
-        marginTop: 3,
-        marginLeft: -10,
+    successText: {
+        color: Colors.successColor,
+        paddingHorizontal: 20,
+        paddingBottom: 5,
+        fontWeight: 'bold'
     },
-    getStartedContainer: {
-        alignItems: 'center',
-        marginHorizontal: 50,
+    buttonsContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+        justifyContent: 'space-around'
     },
-    homeScreenFilename: {
-        marginVertical: 7,
-    },
-    codeHighlightText: {
-        color: 'rgba(96,100,109, 0.8)',
-    },
-    codeHighlightContainer: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderRadius: 3,
-        paddingHorizontal: 4,
-    },
-    getStartedText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        lineHeight: 24,
-        textAlign: 'center',
-    },
-    tabBarInfoContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        ...Platform.select({
-            ios: {
-                shadowColor: 'black',
-                shadowOffset: { width: 0, height: -3 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-            },
-            android: {
-                elevation: 20,
-            },
-        }),
-        alignItems: 'center',
-        backgroundColor: '#fbfbfb',
-        paddingVertical: 20,
-    },
-    tabBarInfoText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        textAlign: 'center',
-    },
-    navigationFilename: {
-        marginTop: 5,
-    },
-    helpContainer: {
-        marginTop: 15,
-        alignItems: 'center',
-    },
-    helpLink: {
-        paddingVertical: 15,
-    },
-    helpLinkText: {
-        fontSize: 14,
-        color: '#2e78b7',
+    cancel: {
+        backgroundColor: Colors.warningBackground,
     },
 });
