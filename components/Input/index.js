@@ -4,6 +4,7 @@ import styles from './styles';
 
 export default class Input extends Component {
     static defaultProps = {
+        autoCapitalize: 'none',
         label: '',
         multiline: false,
         onChangeText: () => { },
@@ -19,6 +20,7 @@ export default class Input extends Component {
 
     render() {
         const {
+            autoCapitalize,
             label,
             multiline,
             onChangeText,
@@ -42,7 +44,7 @@ export default class Input extends Component {
                     style={inputStyle}
                     secureTextEntry={secureTextEntry}
                     onSubmitEditing={onSubmitEditing}
-                    autoCapitalize="none"
+                    autoCapitalize={autoCapitalize}
                     multiline={multiline}
                 />
             </View>

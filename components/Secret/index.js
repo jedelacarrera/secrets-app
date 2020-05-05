@@ -4,6 +4,8 @@ import { Alert, View, Text, TouchableOpacity } from 'react-native';
 import Crypto from 'crypto-js'
 import Input from '../Input';
 import styles from './styles';
+import Colors from '../../constants/Colors';
+import { keyPrefix } from '../../constants/strings';
 
 export default class Secret extends Component {
     static defaultProps = {
@@ -28,12 +30,17 @@ export default class Secret extends Component {
             this.setState({ password, decryptedSecret: '', valid: false });
             return;
         }
-        let decryptedSecret = Crypto.AES.decrypt(this.props.item.secret, password).toString(Crypto.enc.Utf8)
         let valid = true;
-        console.log(decryptedSecret);
-        if (!decryptedSecret) {
-            decryptedSecret = 'Invalid password';
+        let decryptedSecret;
+        try {
+            decryptedSecret = Crypto.AES.decrypt(this.props.item.secret, password).toString(Crypto.enc.Utf8)
+            if (!decryptedSecret) {
+                decryptedSecret = 'Invalid password';
+                valid = false;
+            }
+        } catch (_error) {
             valid = false;
+            decryptedSecret = 'Invalid password';
         }
         this.setState({
             password,
@@ -71,7 +78,7 @@ export default class Secret extends Component {
                     value={this.state.password}
                     onChangeText={this.decrypt}
                     placeholder="******"
-                    label={`Write "${label}" password`}
+                    label={`Write ${label} password`}
                     secureTextEntry
                 />
                 <Text style={valid ? styles.decrypted : styles.error}>{decryptedSecret}</Text>
@@ -89,18 +96,20 @@ export default class Secret extends Component {
             <View style={styles.container}>
                 <TouchableOpacity style={styles.firstContainer} onPress={() => this.setState({ selected: !this.state.selected })}>
                     <View style={styles.nameContainer}>
-                        <Text style={styles.name}>{name}</Text>
+                        <Text style={styles.name}>{name.slice(keyPrefix.length)}</Text>
                         <Text style={styles.notes}>{notes}</Text>
                     </View>
                     <View style={styles.iconsContainer}>
-                        <Ionicons
+                        {/* <Ionicons
                             name="md-eye"
                             size={25}
-                        />
+                            color={Colors.primary}
+                        /> */}
                         <Ionicons
                             name="md-trash"
                             size={25}
                             onPress={this.confirmDelete}
+                            color={Colors.warning}
                         />
                     </View>
                 </TouchableOpacity>

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import Colors from '../../constants/Colors';
 
 export default styles = StyleSheet.create({
     inputStyle: {
@@ -12,11 +13,12 @@ export default styles = StyleSheet.create({
     labelStyle: {
         fontSize: 16,
         color: '#7d8995',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: Colors.primary,
     },
     containerStyle: {
-        height: 55,
-        paddingLeft: 20,
+        minHeight: 55,
+        // paddingLeft: 20,
         marginBottom: 12,
         flex: 1,
     },

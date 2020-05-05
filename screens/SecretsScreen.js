@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { keyPrefix } from '../constants/strings'
+import Colors from '../constants/Colors'
 import Secret from '../components/Secret'
 
 const encrypted = Crypto.AES.encrypt("Message", "Secret Passphrase").toString();
@@ -59,12 +60,9 @@ export default class HomeScreen extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <Text>{decrypted}</Text>
-          {this.renderValues()}
-        </ScrollView>
-      </View>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {this.renderValues()}
+      </ScrollView>
     );
   }
 }
@@ -72,9 +70,10 @@ export default class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.backgroundColor,
+    paddingTop: 10,
   },
   contentContainer: {
-    paddingTop: 30,
+    paddingBottom: 100,
   },
 });
