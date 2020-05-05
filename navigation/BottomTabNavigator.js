@@ -23,6 +23,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: 'Secrets',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-lock" />,
+          unmountOnBlur: true,
         }}
       />
       <BottomTab.Screen
@@ -50,10 +51,10 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Secrets':
-      return 'How to get started!';
+      return 'My Secrets';
     case 'New':
       return 'Add a new secret';
     case 'Docs':
-      return 'Docs to learn more';
+      return 'Docs';
   }
 }

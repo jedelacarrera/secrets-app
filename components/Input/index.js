@@ -5,6 +5,7 @@ import styles from './styles';
 export default class Input extends Component {
     static defaultProps = {
         label: '',
+        multiline: false,
         onChangeText: () => { },
         onSubmitEditing: () => { },
         placeholder: '',
@@ -19,11 +20,12 @@ export default class Input extends Component {
     render() {
         const {
             label,
-            value,
+            multiline,
             onChangeText,
+            onSubmitEditing,
             placeholder,
             secureTextEntry,
-            onSubmitEditing,
+            value,
         } = this.props;
         const { inputStyle, labelStyle, containerStyle } = styles;
 
@@ -41,6 +43,7 @@ export default class Input extends Component {
                     secureTextEntry={secureTextEntry}
                     onSubmitEditing={onSubmitEditing}
                     autoCapitalize="none"
+                    multiline={multiline}
                 />
             </View>
         )

@@ -18,5 +18,6 @@ export default styles = StyleSheet.create({
         height: 55,
         paddingLeft: 20,
         marginBottom: 12,
+        flex: 1,
     },
 });
