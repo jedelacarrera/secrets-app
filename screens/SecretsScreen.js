@@ -1,20 +1,18 @@
-import * as WebBrowser from 'expo-web-browser';
 import React, { Component } from 'react';
 import Crypto from 'crypto-js'
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { MonoText } from '../components/StyledText';
+import { keyPrefix } from '../constants/strings'
+import Colors from '../constants/Colors'
+import Secret from '../components/Secret'
 
 const encrypted = Crypto.AES.encrypt("Message", "Secret Passphrase").toString();
 
 const decrypted = Crypto.AES.decrypt(encrypted, "Secret Passphrase").toString(Crypto.enc.Utf8);
 
-// https://docs.expo.io/versions/latest/react-native/asyncstorage/
-
 export default class HomeScreen extends Component {
   state = {
-    keys: [],
     values: [],
     errors: '',
   }
@@ -30,16 +28,16 @@ export default class HomeScreen extends Component {
         this.setState({ errors: 'Error getting keys, restart the app.' });
         return;
       }
-      AsyncStorage.multiGet(keys, (error, values) => {
+      const filteredKeys = keys.filter(key => key.slice(0, keyPrefix.length) === keyPrefix)
+      AsyncStorage.multiGet(filteredKeys, (error, values) => {
         if (error) {
           console.log(error);
           this.setState({ errors: 'Error getting values, restart the app.' });
           return;
         }
-        const decryptedValues = values.map(values => {
-          const decryptedValue = Crypto.AES.decrypt(values[1], "Secret Passphrase").toString(Crypto.enc.Utf8);
-          return [values[0], decryptedValue]
-        })
+        const decryptedValues = values.map(values =>
+          ({ name: values[0], ...JSON.parse(values[1]) })
+        )
         this.setState({ values: decryptedValues });
       });
     });
@@ -52,18 +50,19 @@ export default class HomeScreen extends Component {
 
   renderValues() {
     return this.state.values.map((value, index) => (
-      <Text key={index}>{value[0]}: {value[1]}</Text>
+      <Secret
+        key={index}
+        item={value}
+        delete={() => this.removeKey(value.name)}
+      />
     ));
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <Text>{decrypted}</Text>
-          {this.renderValues()}
-        </ScrollView>
-      </View>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {this.renderValues()}
+      </ScrollView>
     );
   }
 }
@@ -71,9 +70,10 @@ export default class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.backgroundColor,
+    paddingTop: 10,
   },
   contentContainer: {
-    paddingTop: 30,
+    paddingBottom: 100,
   },
 });

@@ -1,17 +1,15 @@
-const tintColor = '#2f95dc';
+const primary = '#2f95dc';
+const warning = '#ffcc00';
+const error = '#e54141';
+const success = '#339900';
+const unfocused = '#ccc';
+const backgroundColor = '#f9f9f9';
 
 export default {
-  tintColor,
-  tabIconDefault: '#ccc',
-  tabIconSelected: tintColor,
-  tabBar: '#fefefe',
-  errorBackground: 'red',
-  errorText: '#fff',
-  warningBackground: '#ffcc00',
-  warningText: '#666804',
-  noticeBackground: tintColor,
-  noticeText: '#fff',
-  backgroundColor: '#f9f9f9',
-  errorColor: '#e54141',
-  successColor: '#339900',
+  primary,
+  warning,
+  error,
+  success,
+  unfocused,
+  backgroundColor,
 };

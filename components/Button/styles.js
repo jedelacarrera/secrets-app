@@ -7,7 +7,7 @@ export default styles = StyleSheet.create({
         paddingHorizontal: 50,
         borderRadius: 5,
         paddingVertical: 5,
-        backgroundColor: Colors.tintColor,
+        backgroundColor: Colors.primary,
     },
     buttonText: {
         color: '#fff',
@@ -15,6 +15,6 @@ export default styles = StyleSheet.create({
         fontSize: 16,
     },
     disabled: {
-        opacity: 0.4
+        opacity: 0.5
     }
 });

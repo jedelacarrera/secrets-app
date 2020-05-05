@@ -4,7 +4,9 @@ import styles from './styles';
 
 export default class Input extends Component {
     static defaultProps = {
+        autoCapitalize: 'none',
         label: '',
+        multiline: false,
         onChangeText: () => { },
         onSubmitEditing: () => { },
         placeholder: '',
@@ -18,12 +20,14 @@ export default class Input extends Component {
 
     render() {
         const {
+            autoCapitalize,
             label,
-            value,
+            multiline,
             onChangeText,
+            onSubmitEditing,
             placeholder,
             secureTextEntry,
-            onSubmitEditing,
+            value,
         } = this.props;
         const { inputStyle, labelStyle, containerStyle } = styles;
 
@@ -40,7 +44,8 @@ export default class Input extends Component {
                     style={inputStyle}
                     secureTextEntry={secureTextEntry}
                     onSubmitEditing={onSubmitEditing}
-                    autoCapitalize="none"
+                    autoCapitalize={autoCapitalize}
+                    multiline={multiline}
                 />
             </View>
         )
