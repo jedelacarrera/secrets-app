@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Crypto from 'crypto-js'
 import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -7,9 +6,6 @@ import { keyPrefix } from '../constants/strings'
 import Colors from '../constants/Colors'
 import Secret from '../components/Secret'
 
-const encrypted = Crypto.AES.encrypt("Message", "Secret Passphrase").toString();
-
-const decrypted = Crypto.AES.decrypt(encrypted, "Secret Passphrase").toString(Crypto.enc.Utf8);
 
 export default class HomeScreen extends Component {
   state = {
@@ -35,10 +31,8 @@ export default class HomeScreen extends Component {
           this.setState({ errors: 'Error getting values, restart the app.' });
           return;
         }
-        const decryptedValues = values.map(values =>
-          ({ name: values[0], ...JSON.parse(values[1]) })
-        )
-        this.setState({ values: decryptedValues });
+        const parsedValues = values.map(values => ({ name: values[0], ...JSON.parse(values[1]) }));
+        this.setState({ values: parsedValues });
       });
     });
   }
@@ -49,6 +43,13 @@ export default class HomeScreen extends Component {
   }
 
   renderValues() {
+    if (!this.state.values.length) {
+      return (
+        <View style={styles.defaultTextContainer}>
+          <Text style={styles.defaultText}>Go to the "New" tab to save secrets</Text>
+        </View>
+      );
+    }
     return this.state.values.map((value, index) => (
       <Secret
         key={index}
@@ -76,4 +77,13 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingBottom: 100,
   },
+  defaultText: {
+    alignSelf: 'center',
+    fontSize: 20,
+    color: Colors.unfocused,
+  },
+  defaultTextContainer: {
+    flex: 1,
+    marginTop: 250,
+  }
 });
