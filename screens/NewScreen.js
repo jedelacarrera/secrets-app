@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around'
     },
     cancel: {
+        opacity: 0.9,
         backgroundColor: Colors.warning,
     },
 });

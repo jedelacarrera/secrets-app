@@ -109,7 +109,7 @@ export default class Secret extends Component {
                             name="md-trash"
                             size={25}
                             onPress={this.confirmDelete}
-                            color={Colors.warning}
+                            color={Colors.warningRGBA}
                         />
                     </View>
                 </TouchableOpacity>
