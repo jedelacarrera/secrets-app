@@ -13,7 +13,12 @@ export default function OptionButton({ icon, labels, onPress }) {
                 </View>
                 <View>
                     {labels.map((label, index) => (
-                        <Text style={[styles.optionText, index === 0 && styles.firstOptionText]}>{label}</Text>)
+                        <Text
+                            key={index}
+                            style={[styles.optionText, index === 0 && styles.firstOptionText]}
+                        >
+                            {label}
+                        </Text>)
                     )}
                 </View>
             </View>
