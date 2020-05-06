@@ -28,7 +28,9 @@
     },
     "android": {
       "package": "com.jedelacarrera.secrets_app",
-      "versionCode": 1
+      "permissions": [],
+      "versionCode": 1,
+      "enableDangerousExperimentalLeanBuilds": true
     }
   }
 }
