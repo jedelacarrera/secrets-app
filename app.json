@@ -25,6 +25,12 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.jedelacarrera.secrets_app",
+      "permissions": [],
+      "versionCode": 1,
+      "enableDangerousExperimentalLeanBuilds": true
     }
   }
 }
